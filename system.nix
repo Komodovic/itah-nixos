@@ -3,6 +3,7 @@
     ./hardware.nix
     ./system/boot.nix
     ./system/desktop.nix
+    ./system/graphics.nix
     ./system/locale.nix
     ./system/maintenance.nix
     ./system/networking.nix

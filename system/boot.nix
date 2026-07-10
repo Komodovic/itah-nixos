@@ -5,4 +5,6 @@
 
   hardware.enableRedistributableFirmware = true;
   zramSwap.enable = true;
+
+  boot.tmp.cleanOnBoot = true;
 }

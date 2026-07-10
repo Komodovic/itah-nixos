@@ -18,6 +18,9 @@
     name = "itah";
     ensurePermissions = { "itah.*" = "ALL PRIVILEGES"; };
   }];
+  systemd.services.mysql.wantedBy = lib.mkForce [ ];
+
+  services.fwupd.enable = true;
 
   systemd.user.services.polkit-gnome = {
     description = "PolicyKit Authentication Agent";
