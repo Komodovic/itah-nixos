@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, nixvim, ... }:
 
 {
   home.username = "itah";
@@ -8,5 +8,6 @@
 
   imports = [
     ./home
+    nixvim.homeModules.default
   ];
 }

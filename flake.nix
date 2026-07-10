@@ -18,9 +18,14 @@
       url = "github:noctalia-dev/noctalia";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, niri, noctalia, ... }: let
+  outputs = { self, nixpkgs, home-manager, niri, noctalia, nixvim, ... }: let
     system = "x86_64-linux";
     lib = nixpkgs.lib;
   in {
@@ -37,6 +42,7 @@
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.backupFileExtension = "bak";
+          home-manager.extraSpecialArgs = { inherit nixvim; };
           home-manager.users.itah = import ./home.nix;
         }
       ];
