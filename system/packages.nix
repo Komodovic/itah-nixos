@@ -8,7 +8,7 @@
     audacity
     bat
     bibata-cursors
-    brave
+    (brave.override { commandLineArgs = "--enable-features=VaapiVideoDecoder,VaapiVideoEncoder,AcceleratedVideoDecodeLinuxGL,AcceleratedVideoEncoder"; })
     brightnessctl
     btop
     cava
