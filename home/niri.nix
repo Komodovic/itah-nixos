@@ -81,6 +81,11 @@ binds {
     Mod+Ctrl+R  { switch-preset-window-width; }
     Mod+Shift+R { switch-preset-window-height; }
 
+    Mod+Minus       { set-column-width "-10%"; }
+    Mod+Equal       { set-column-width "+10%"; }
+    Mod+Shift+Minus { set-window-height "-10%"; }
+    Mod+Shift+Equal { set-window-height "+10%"; }
+
     Mod+W       { toggle-column-tabbed-display; }
     Mod+Z       { center-column; }
     Mod+Shift+Z { center-visible-columns; }
