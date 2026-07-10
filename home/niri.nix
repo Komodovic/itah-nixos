@@ -74,6 +74,16 @@ binds {
     Mod+Shift+Down  { move-window-to-workspace-down; }
     Mod+Shift+Up    { move-window-to-workspace-up; }
 
+    // ── MONITORS ──
+    Mod+Ctrl+H       { focus-monitor-left; }
+    Mod+Ctrl+L       { focus-monitor-right; }
+    Mod+Ctrl+Shift+H { move-column-to-monitor-left; }
+    Mod+Ctrl+Shift+L { move-column-to-monitor-right; }
+
+    // ── MOUSE WHEEL ──
+    Mod+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
+    Mod+WheelScrollUp   cooldown-ms=150 { focus-workspace-up; }
+
     // ── WINDOW STATE ──
     Mod+F       { maximize-column; }
     Mod+Shift+F { fullscreen-window; }
@@ -188,18 +198,18 @@ binds {
     Mod+Shift+F23 { spawn "kitty" "-e" "opencode"; }
 
     // ── MEDIA KEYS ──
-    XF86MonBrightnessUp   { spawn "noctalia" "msg" "brightness-up" "5"; }
-    XF86MonBrightnessDown { spawn "noctalia" "msg" "brightness-down" "5"; }
+    XF86MonBrightnessUp   allow-when-locked=true { spawn "noctalia" "msg" "brightness-up" "5"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "noctalia" "msg" "brightness-down" "5"; }
 
-    XF86AudioRaiseVolume  { spawn "noctalia" "msg" "volume-up" "5"; }
-    XF86AudioLowerVolume  { spawn "noctalia" "msg" "volume-down" "5"; }
-    XF86AudioMute         { spawn "noctalia" "msg" "volume-mute"; }
-    XF86AudioMicMute      { spawn "noctalia" "msg" "mic-mute"; }
-    XF86AudioPlay         { spawn "noctalia" "msg" "media" "toggle"; }
-    XF86AudioPause        { spawn "noctalia" "msg" "media" "toggle"; }
-    XF86AudioNext         { spawn "noctalia" "msg" "media" "next"; }
-    XF86AudioPrev         { spawn "noctalia" "msg" "media" "previous"; }
-    XF86AudioStop         { spawn "noctalia" "msg" "media" "stop"; }
+    XF86AudioRaiseVolume  allow-when-locked=true { spawn "noctalia" "msg" "volume-up" "5"; }
+    XF86AudioLowerVolume  allow-when-locked=true { spawn "noctalia" "msg" "volume-down" "5"; }
+    XF86AudioMute         allow-when-locked=true { spawn "noctalia" "msg" "volume-mute"; }
+    XF86AudioMicMute      allow-when-locked=true { spawn "noctalia" "msg" "mic-mute"; }
+    XF86AudioPlay         allow-when-locked=true { spawn "noctalia" "msg" "media" "toggle"; }
+    XF86AudioPause        allow-when-locked=true { spawn "noctalia" "msg" "media" "toggle"; }
+    XF86AudioNext         allow-when-locked=true { spawn "noctalia" "msg" "media" "next"; }
+    XF86AudioPrev         allow-when-locked=true { spawn "noctalia" "msg" "media" "previous"; }
+    XF86AudioStop         allow-when-locked=true { spawn "noctalia" "msg" "media" "stop"; }
 }
   '';
 }
