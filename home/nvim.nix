@@ -103,19 +103,18 @@
       require("dapui").setup()
 
       -- ── Java LSP via packaged jdtls (Nix-pure, no runtime download) ──
+      -- Use the nix-provided bin/jdtls wrapper: it sets
+      -- osgi.sharedConfiguration.area.readOnly=true and cascades writes to a
+      -- writable dir, so it works against the read-only store config_linux.
       local jdtls = require("jdtls")
-      local launcher = vim.fn.glob("${pkgs.jdt-language-server}/share/java/jdtls/plugins/org.eclipse.equinox.launcher_*.jar")
-      local jdtls_config = "${pkgs.jdt-language-server}/share/java/jdtls/config_linux"
+      local jdtls_bin = "${pkgs.jdt-language-server}/bin/jdtls"
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "java",
         callback = function()
+          local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
+          local workspace = vim.fn.stdpath("data") .. "/jdtls/" .. project_name
           jdtls.start_or_attach({
-            cmd = {
-              "java",
-              "-jar", launcher,
-              "-configuration", jdtls_config,
-              "-data", vim.fn.stdpath("data") .. "/jdtls",
-            },
+            cmd = { jdtls_bin, "-data", workspace },
             root_dir = jdtls.setup.find_root({ ".git", "build.gradle", "pom.xml" }),
             init_options = { bundles = {} },
           })
