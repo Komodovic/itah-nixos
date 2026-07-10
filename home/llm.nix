@@ -1,7 +1,12 @@
 { ... }: {
   programs.fish.functions = {
     __llm_model = ''
-      ls ~/models/*.gguf 2>/dev/null | head -1
+      set -l default ~/models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf
+      if test -f "$default"
+          echo "$default"
+      else
+          ls ~/models/*.gguf 2>/dev/null | head -1
+      end
     '';
 
     __llm_flags = ''
@@ -41,7 +46,7 @@
     llm-download = ''
       if test (count $argv) -lt 2
           echo "Usage: llm-download <hf-repo> <filename>"
-          echo "Example: llm-download bartowski/Qwen_Qwen3.5-9B-GGUF Qwen_Qwen3.5-9B-Q4_K_M.gguf"
+          echo "Example: llm-download bartowski/Qwen_Qwen3-4B-Instruct-2507-GGUF Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
           return 1
       end
       set REPO $argv[1]
@@ -76,7 +81,7 @@
           echo " ready"
           set -g NANOCODER_SERVER 1
       end
-      ~/.npm-global/bin/nanocoder -p local -m qwen-3.5-9b $argv
+      ~/.npm-global/bin/nanocoder -p local -m qwen3-4b-instruct $argv
       if set -q NANOCODER_SERVER
           echo "Stopping llama-server..."
           kill $NANOCODER_SERVER_PID 2>/dev/null
