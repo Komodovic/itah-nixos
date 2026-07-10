@@ -105,5 +105,6 @@
     ./niri.nix
     ./kitty.nix
     ./fish.nix
+    ./llm.nix
   ];
 }
