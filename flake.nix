@@ -23,9 +23,14 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nvf = {
+      url = "github:NotAShelf/nvf";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, niri, noctalia, nixvim, ... }: let
+  outputs = { self, nixpkgs, home-manager, niri, noctalia, nixvim, nvf, ... }: let
     system = "x86_64-linux";
     lib = nixpkgs.lib;
   in {
@@ -42,7 +47,7 @@
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.backupFileExtension = "bak";
-          home-manager.extraSpecialArgs = { inherit nixvim; };
+          home-manager.extraSpecialArgs = { inherit nixvim nvf; };
           home-manager.users.itah = import ./home.nix;
         }
       ];

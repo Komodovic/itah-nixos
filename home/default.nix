@@ -106,6 +106,6 @@
     ./kitty.nix
     ./fish.nix
     ./llm.nix
-    ./nvim.nix
+    ./nvf.nix
   ];
 }
