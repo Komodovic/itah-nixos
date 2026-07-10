@@ -17,7 +17,10 @@
     after = [ "network-online.target" ];
     wants = [ "network-online.target" ];
     path = with pkgs; [ nixos-rebuild nix git openssh coreutils ];
-    serviceConfig.Type = "oneshot";
+    serviceConfig = {
+      Type = "oneshot";
+      Environment = "HOME=/root";
+    };
     script = ''
       set -euo pipefail
       export GIT_SSH_COMMAND="ssh -i /home/itah/.ssh/id_ed25519 -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
