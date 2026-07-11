@@ -106,9 +106,24 @@
         })
 
         -- lualine (LazyVim-ish): mode | file | branch | diagnostics | lsp
+        -- Custom theme built from the mauve base16 palette so we don't depend
+        -- on a base16 colors_name being set (which avoids the config warning).
+        local C = {
+          bg = '#181115', fg = '#eddfe3', muted = '#9f8c94',
+          panel = '#30282b', accent = '#ffaed9', accent2 = '#eab9d1',
+          red = '#ffb4ab',
+        }
         require('lualine').setup({
           options = {
-            theme = 'base16',
+            theme = {
+              normal   = { a = { fg = C.bg, bg = C.accent },  b = { fg = C.fg, bg = C.panel }, c = { fg = C.muted, bg = C.bg } },
+              insert   = { a = { fg = C.bg, bg = C.accent2 } },
+              visual   = { a = { fg = C.bg, bg = C.accent2 } },
+              replace  = { a = { fg = C.bg, bg = C.red } },
+              command  = { a = { fg = C.bg, bg = C.accent } },
+              terminal = { a = { fg = C.bg, bg = C.accent } },
+              inactive = { a = { fg = C.muted, bg = C.panel }, b = { fg = C.muted, bg = C.panel }, c = { fg = C.muted, bg = C.bg } },
+            },
             component_separators = { left = '', right = '' },
             section_separators = { left = '', right = '' },
             icons_enabled = true,
