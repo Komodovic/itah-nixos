@@ -27,6 +27,11 @@
       end
       command rm -f -- "$tmp"
     '';
+    # edit root-owned files with *your* nvim config: sudo -e copies the file
+    # to a temp copy, runs $EDITOR (itah's nvim) as you, then writes it back.
+    sedit = ''
+      sudo -E -e $argv
+    '';
     };
   };
 }
