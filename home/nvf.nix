@@ -153,18 +153,6 @@
         -- re-sync when returning to nvim after a wallpaper change
         vim.api.nvim_create_autocmd('FocusGained', { callback = apply_noctalia, desc = 'Sync nvim colors with noctalia' })
 
-        -- jdtls echoes the Java LSP's `language/status` ("ServiceReady", etc.)
-        -- into the message area; silence it (keep the client working otherwise).
-        vim.api.nvim_create_autocmd('LspAttach', {
-          desc = 'Silence jdtls language/status echo',
-          callback = function(args)
-            local client = vim.lsp.get_client_by_id(args.data.client_id)
-            if client and client.name == 'jdtls' then
-              client.handlers['language/status'] = function() end
-            end
-          end,
-        })
-
         -- LSP diagnostic signs in the gutter: use symbols instead of plain
         -- W/E/I/H text so the sign column looks cleaner.
         vim.diagnostic.config({
