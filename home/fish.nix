@@ -29,8 +29,9 @@
     '';
     # edit root-owned files with *your* nvim config: sudo -e copies the file
     # to a temp copy, runs $EDITOR (itah's nvim) as you, then writes it back.
+    # Do NOT pass `nvim` as an argument — sudo -e uses $EDITOR automatically.
     sedit = ''
-      sudo -E -e $argv
+      sudo -e $argv
     '';
     };
   };
