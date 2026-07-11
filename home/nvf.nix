@@ -64,6 +64,13 @@
         alpha      = { package = pkgs.vimPlugins.alpha-nvim; };
         gitsigns   = { package = pkgs.vimPlugins.gitsigns-nvim; };
         devicons   = { package = pkgs.vimPlugins.nvim-web-devicons; };
+
+        # Completion sources + snippets (LazyVim ships these by default)
+        cmp-buffer = { package = pkgs.vimPlugins.cmp-buffer; };
+        cmp-path   = { package = pkgs.vimPlugins.cmp-path; };
+        cmp-cmdline= { package = pkgs.vimPlugins.cmp-cmdline; };
+        luasnip    = { package = pkgs.vimPlugins.luasnip; };
+        friendly   = { package = pkgs.vimPlugins.friendly-snippets; };
       };
 
       # ── Raw Lua: LazyVim-ish look (mauve palette) ──
@@ -231,6 +238,64 @@
 
         -- dap UI
         require("dapui").setup()
+
+        -- ── Autocomplete parity with LazyVim ──
+        -- nvf already enables nvim-cmp + nvim_lsp source + LSP keymaps.
+        -- Add the buffer/path/cmdline sources + snippet engine LazyVim ships.
+        local cmp = require("cmp")
+        local luasnip = require("luasnip")
+
+        -- load friendly-snippets
+        require("luasnip.loaders.from_vscode").lazy_load()
+
+        -- extend sources (nvim_lsp already present from nvf)
+        cmp.setup({
+          snippet = {
+            expand = function(args) luasnip.lsp_expand(args.body) end,
+          },
+          sources = cmp.config.sources({
+            { name = "nvim_lsp" },
+            { name = "luasnip" },
+            { name = "buffer",  keyword_length = 3 },
+            { name = "path" },
+          }),
+          mapping = cmp.mapping.preset.insert({
+            ["<C-Space>"] = cmp.mapping.complete(),
+            ["<CR>"] = cmp.mapping.confirm({ select = true }),
+            ["<Tab>"] = cmp.mapping(function(fallback)
+              if cmp.visible() then
+                cmp.select_next_item()
+              elseif luasnip.expand_or_jumpable() then
+                luasnip.expand_or_jump()
+              else
+                fallback()
+              end
+            end, { "i", "s" }),
+            ["<S-Tab>"] = cmp.mapping(function(fallback)
+              if cmp.visible() then
+                cmp.select_prev_item()
+              elseif luasnip.jumpable(-1) then
+                luasnip.jump(-1)
+              else
+                fallback()
+              end
+            end, { "i", "s" }),
+          }),
+        })
+
+        -- `/` and `?` search completion
+        cmp.setup.cmdline({ "/", "?" }, {
+          mapping = cmp.mapping.preset.cmdline(),
+          sources = { { name = "buffer" } },
+        })
+        -- `:` command-line completion
+        cmp.setup.cmdline(":", {
+          mapping = cmp.mapping.preset.cmdline(),
+          sources = cmp.config.sources({
+            { name = "path" },
+            { name = "cmdline" },
+          }),
+        })
       '';
     };
   };

@@ -2,7 +2,7 @@
 
 {
   programs.nixvim = {
-    enable = true;
+    enable = false; # disabled: using nvf as the sole neovim config (also disables nixCats)
 
     # ── System tools wrapped into Neovim's PATH (no Mason needed) ──
     extraPackages = with pkgs; [
