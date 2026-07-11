@@ -71,29 +71,87 @@
         vim.g.mapleader = " "
         vim.g.maplocalleader = "\\"
 
-        -- matugen / base16 custom theme (mauve palette)
-        require('base16-colorscheme').setup({
-          base00 = '#181115', base01 = '#251e21', base02 = '#30282b',
-          base03 = '#9f8c94', base04 = '#d6c1c9', base05 = '#eddfe3',
-          base06 = '#eddfe3', base07 = '#eddfe3', base08 = '#ffb4ab',
-          base09 = '#ffb5a0', base0A = '#eab9d1', base0B = '#ffaed9',
-          base0C = '#ffb5a0', base0D = '#ffaed9', base0E = '#eab9d1',
-          base0F = '#93000a',
-        })
+        -- ── Follow noctalia's live palette (regenerated on wallpaper change) ──
+        -- noctalia writes its current colors to the kitty theme file; we read it
+        -- and derive both the base16 colorscheme and the lualine theme from it.
+        local function parse_noctalia(path)
+          local f = io.open(vim.fn.expand(path))
+          if not f then return nil end
+          local c = {}
+          for line in f:lines() do
+            local k, v = line:match('^(%S+)%s+#(%x%x%x%x%x%x)')
+            if k and v then
+              if k:match('^color%d+$') then c[tonumber(k:sub(6))] = '#' .. v end
+              if k == 'background' then c.bg = '#' .. v end
+              if k == 'foreground' then c.fg = '#' .. v end
+              if k == 'selection_background' then c.sel = '#' .. v end
+            end
+          end
+          f:close()
+          if c.bg and c[0] then return c end
+          return nil
+        end
 
-        local hi = function(g, o) vim.api.nvim_set_hl(0, g, o) end
-        hi('TelescopeNormal',         { fg = '#eddfe3', bg = '#181115' })
-        hi('TelescopeBorder',         { fg = '#9f8c94', bg = '#181115' })
-        hi('TelescopePromptNormal',   { fg = '#eddfe3', bg = '#181115' })
-        hi('TelescopePromptBorder',   { fg = '#9f8c94', bg = '#181115' })
-        hi('TelescopePromptPrefix',   { fg = '#ffaed9', bg = '#181115' })
-        hi('TelescopePromptCounter',  { fg = '#d6c1c9', bg = '#181115' })
-        hi('TelescopePromptTitle',    { fg = '#181115', bg = '#ffaed9' })
-        hi('TelescopePreviewTitle',   { fg = '#181115', bg = '#eab9d1' })
-        hi('TelescopeResultsTitle',   { fg = '#181115', bg = '#ffb5a0' })
-        hi('TelescopeSelection',      { fg = '#eddfe3', bg = '#30282b' })
-        hi('TelescopeSelectionCaret', { fg = '#ffaed9', bg = '#30282b' })
-        hi('TelescopeMatching',       { fg = '#ffaed9', bold = true })
+        local function apply_noctalia()
+          local c = parse_noctalia('~/.config/kitty/themes/noctalia.conf')
+          if not c then return end
+          local bg, fg, muted, sel = c.bg, c.fg, c[8], c.sel or c[0]
+          local mauve, blue, pink = c[4], c[2], c[1]
+
+          -- base16 palette derived from noctalia's ANSI colors
+          require('base16-colorscheme').setup({
+            base00 = bg,  base01 = c[0], base02 = c[8], base03 = c[8],
+            base04 = c[3], base05 = fg,  base06 = fg,  base07 = fg,
+            base08 = c[1], base09 = c[3], base0A = c[3], base0B = c[2],
+            base0C = c[6], base0D = c[4], base0E = c[5], base0F = c[1],
+          })
+
+          -- telescope highlights follow noctalia bg/fg
+          local hi = function(g, o) vim.api.nvim_set_hl(0, g, o) end
+          hi('TelescopeNormal',         { fg = fg, bg = bg })
+          hi('TelescopeBorder',         { fg = muted, bg = bg })
+          hi('TelescopePromptNormal',   { fg = fg, bg = bg })
+          hi('TelescopePromptBorder',   { fg = muted, bg = bg })
+          hi('TelescopePromptPrefix',   { fg = mauve, bg = bg })
+          hi('TelescopePromptCounter',  { fg = c[7], bg = bg })
+          hi('TelescopePromptTitle',    { fg = bg, bg = mauve })
+          hi('TelescopePreviewTitle',   { fg = bg, bg = c[5] })
+          hi('TelescopeResultsTitle',   { fg = bg, bg = blue })
+          hi('TelescopeSelection',      { fg = fg, bg = sel })
+          hi('TelescopeSelectionCaret', { fg = mauve, bg = sel })
+          hi('TelescopeMatching',       { fg = mauve, bold = true })
+
+          -- lualine theme derived from noctalia
+          require('lualine').setup({
+            options = {
+              theme = {
+                normal   = { a = { fg = bg, bg = mauve },  b = { fg = fg, bg = sel }, c = { fg = muted, bg = bg } },
+                insert   = { a = { fg = bg, bg = blue } },
+                visual   = { a = { fg = bg, bg = mauve } },
+                replace  = { a = { fg = bg, bg = pink } },
+                command  = { a = { fg = bg, bg = mauve } },
+                terminal = { a = { fg = bg, bg = mauve } },
+                inactive = { a = { fg = muted, bg = sel }, b = { fg = muted, bg = sel }, c = { fg = muted, bg = bg } },
+              },
+              component_separators = { left = '', right = '' },
+              section_separators = { left = '', right = '' },
+              icons_enabled = true,
+            },
+            sections = {
+              lualine_a = { 'mode' },
+              lualine_b = { 'branch', 'diff', 'diagnostics' },
+              lualine_c = { { 'filename', path = 1 } },
+              lualine_x = { 'encoding', 'fileformat', 'filetype' },
+              lualine_y = { 'progress' },
+              lualine_z = { 'location' },
+            },
+            extensions = { 'nvim-tree', 'nvim-dap-ui' },
+          })
+        end
+
+        apply_noctalia()
+        -- re-sync when returning to nvim after a wallpaper change
+        vim.api.nvim_create_autocmd('FocusGained', { callback = apply_noctalia, desc = 'Sync nvim colors with noctalia' })
 
         -- git signs
         require('gitsigns').setup({
@@ -103,40 +161,6 @@
             changedelete = { text = '│' },
           },
           current_line_blame = false,
-        })
-
-        -- lualine (LazyVim-ish): mode | file | branch | diagnostics | lsp
-        -- Custom theme built from the mauve base16 palette so we don't depend
-        -- on a base16 colors_name being set (which avoids the config warning).
-        local C = {
-          bg = '#181115', fg = '#eddfe3', muted = '#9f8c94',
-          panel = '#30282b', accent = '#ffaed9', accent2 = '#eab9d1',
-          red = '#ffb4ab',
-        }
-        require('lualine').setup({
-          options = {
-            theme = {
-              normal   = { a = { fg = C.bg, bg = C.accent },  b = { fg = C.fg, bg = C.panel }, c = { fg = C.muted, bg = C.bg } },
-              insert   = { a = { fg = C.bg, bg = C.accent2 } },
-              visual   = { a = { fg = C.bg, bg = C.accent2 } },
-              replace  = { a = { fg = C.bg, bg = C.red } },
-              command  = { a = { fg = C.bg, bg = C.accent } },
-              terminal = { a = { fg = C.bg, bg = C.accent } },
-              inactive = { a = { fg = C.muted, bg = C.panel }, b = { fg = C.muted, bg = C.panel }, c = { fg = C.muted, bg = C.bg } },
-            },
-            component_separators = { left = '', right = '' },
-            section_separators = { left = '', right = '' },
-            icons_enabled = true,
-          },
-          sections = {
-            lualine_a = { 'mode' },
-            lualine_b = { 'branch', 'diff', 'diagnostics' },
-            lualine_c = { { 'filename', path = 1 } },
-            lualine_x = { 'encoding', 'fileformat', 'filetype' },
-            lualine_y = { 'progress' },
-            lualine_z = { 'location' },
-          },
-          extensions = { 'nvim-tree', 'telescope', 'dapui' },
         })
 
         -- bufferline (top tabline of buffers, like LazyVim)
@@ -189,7 +213,7 @@
           dashboard.button('g', '󰈞  Live grep', '<cmd>Telescope live_grep<CR>'),
           dashboard.button('q', '󰅚  Quit', '<cmd>qa<CR>'),
         }
-        dashboard.section.footer.val = 'mauve · nvf · NixOS'
+        dashboard.section.footer.val = 'noctalia · nvf · NixOS'
         alpha.setup(dashboard.opts)
 
         -- dap UI
