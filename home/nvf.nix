@@ -165,6 +165,19 @@
           end,
         })
 
+        -- LSP diagnostic signs in the gutter: use symbols instead of plain
+        -- W/E/I/H text so the sign column looks cleaner.
+        vim.diagnostic.config({
+          signs = {
+            text = {
+              [vim.diagnostic.severity.ERROR] = '✖',
+              [vim.diagnostic.severity.WARN]  = '⚠',
+              [vim.diagnostic.severity.INFO]  = 'ℹ',
+              [vim.diagnostic.severity.HINT]  = '➤',
+            },
+          },
+        })
+
         -- git signs
         require('gitsigns').setup({
           signs = {
