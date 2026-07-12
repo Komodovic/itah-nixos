@@ -1,5 +1,3 @@
-{ ... }: {
-  xdg.configFile."niri/config.kdl".text = ''
 spawn-at-startup "noctalia"
 
 window-rule {
@@ -53,7 +51,7 @@ binds {
     Mod+Q       { close-window; }
     Mod+Shift+Q { quit; }
 
-    // ── FOCUS NAVIGATION (vim style) ──
+    // ── FOCUS NAVIGATION ──
     Mod+H       { focus-column-left; }
     Mod+J       { focus-workspace-down; }
     Mod+K       { focus-workspace-up; }
@@ -139,7 +137,7 @@ binds {
     Mod+Shift+N { spawn "noctalia" "msg" "panel-toggle" "control-center" "network"; }
     Mod+Shift+P { spawn "noctalia" "msg" "panel-toggle" "control-center" "power"; }
     Mod+Ctrl+Shift+O { spawn "noctalia" "msg" "panel-toggle" "control-center" "monitor"; }
-    
+
     Mod+Shift+E { spawn "noctalia" "msg" "panel-toggle" "control-center" "weather"; }
     Mod+Shift+Y { spawn "noctalia" "msg" "panel-toggle" "control-center" "system"; }
     Mod+Ctrl+Shift+Q { spawn "noctalia" "msg" "panel-toggle" "control-center" "audio"; }
@@ -151,7 +149,7 @@ binds {
     Shift+Print        { spawn "noctalia" "msg" "screenshot-fullscreen"; }
     Ctrl+Print         { screenshot-window; }
 
-    // ── SYSTEM TOGGLES (Mod+Ctrl) ──
+    // ── SYSTEM TOGGLES ──
     Mod+Ctrl+I  { spawn "noctalia" "msg" "wifi-toggle"; }
     Mod+Ctrl+N  { spawn "noctalia" "msg" "nightlight-toggle"; }
     Mod+Ctrl+Y  { spawn "noctalia" "msg" "caffeine-toggle"; }
@@ -160,7 +158,7 @@ binds {
     Mod+Shift+W { spawn "noctalia" "msg" "panel-toggle" "wallpaper"; }
     Mod+Shift+Period { power-off-monitors; }
 
-    // ── PANEL TOGGLES (Mod+Ctrl+Shift) ──
+    // ── PANEL TOGGLES ──
     Mod+Ctrl+Shift+D  { spawn "noctalia" "msg" "window-switcher"; }
     Mod+Ctrl+Shift+A  { spawn "noctalia" "msg" "panel-toggle" "tray-drawer"; }
     Mod+Ctrl+Shift+V  { spawn "noctalia" "msg" "dock-toggle"; }
@@ -170,7 +168,7 @@ binds {
     Mod+Ctrl+Shift+G  { spawn "noctalia" "msg" "notification-clear-active"; }
     Mod+Ctrl+Shift+Z  { spawn "noctalia" "msg" "theme-mode-toggle"; }
 
-    // ── SESSION (Mod+Ctrl+Shift) ──
+    // ── SESSION ──
     Mod+Ctrl+Shift+Backspace { spawn "noctalia" "msg" "session" "logout"; }
     Mod+Ctrl+Shift+R  { spawn "noctalia" "msg" "session" "reboot"; }
     Mod+Ctrl+Shift+S  { spawn "noctalia" "msg" "session" "shutdown"; }
@@ -210,6 +208,4 @@ binds {
     XF86AudioNext         allow-when-locked=true { spawn "noctalia" "msg" "media" "next"; }
     XF86AudioPrev         allow-when-locked=true { spawn "noctalia" "msg" "media" "previous"; }
     XF86AudioStop         allow-when-locked=true { spawn "noctalia" "msg" "media" "stop"; }
-}
-  '';
-}
+};
