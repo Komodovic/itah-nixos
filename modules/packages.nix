@@ -21,6 +21,7 @@
       imv
       jmtpfs
       jq
+      jdk
       kdePackages.qt6ct
       kitty
       lazygit
