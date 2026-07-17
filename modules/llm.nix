@@ -59,6 +59,20 @@
         curl -L -o "$OUT" "$URL"
       '';
 
+      nanocoder = ''
+        nanocoder --provider local --model qwen2.5-coder-7b-instruct $argv
+      '';
+
+      nanocoder-serve = ''
+        set MODEL (__llm_model)
+        if test -z "$MODEL"
+            echo "No GGUF model found in ~/models"
+            return 1
+        end
+        echo "Starting nanocoder server with: $MODEL"
+        llama-server -m "$MODEL" (__llm_flags) --jinja --port 8080 --host 127.0.0.1 $argv
+      '';
+
     };
   };
 }
