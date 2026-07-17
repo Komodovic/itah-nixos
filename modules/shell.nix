@@ -2,8 +2,6 @@
   flake.modules.homeManager.shell = {
     home.sessionPath = [ "$HOME/.npm-global/bin" ];
     home.sessionVariables = {
-      XCURSOR_THEME = "Bibata-Modern-Classic";
-      XCURSOR_SIZE = "18";
       EDITOR = "nvim";
       VISUAL = "nvim";
     };
@@ -25,7 +23,6 @@
         end
       '';
       interactiveShellInit = ''
-        starship init fish | source
         zoxide init fish | source
         pay-respects fish | source
         alias ls="eza"

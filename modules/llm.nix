@@ -2,7 +2,7 @@
   flake.modules.homeManager.llm = {
     programs.fish.functions = {
       __llm_model = ''
-        set -l default ~/models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf
+        set -l default ~/models/qwen2.5-coder-7b-instruct-q4_k_m.gguf
         if test -f "$default"
             echo "$default"
         else
@@ -59,37 +59,6 @@
         curl -L -o "$OUT" "$URL"
       '';
 
-      code = ''
-        if not set -q NANOCODER_SERVER
-            set MODEL (__llm_model)
-            if test -z "$MODEL"
-                echo "No GGUF model found in ~/models"
-                return 1
-            end
-            echo "Starting llama-server in background..."
-            llama-server -m "$MODEL" (__llm_flags) --jinja --port 8080 --host 127.0.0.1 &>/tmp/llama-server.log &
-            set -g NANOCODER_SERVER_PID $last_pid
-            echo -n "Waiting for server"
-            while not curl -s http://127.0.0.1:8080/health >/dev/null 2>&1
-                if not kill -0 $NANOCODER_SERVER_PID 2>/dev/null
-                    echo " failed (see /tmp/llama-server.log)"
-                    set -e NANOCODER_SERVER_PID
-                    return 1
-                end
-                echo -n "."
-                sleep 0.5
-            end
-            echo " ready"
-            set -g NANOCODER_SERVER 1
-        end
-        ~/.npm-global/bin/nanocoder -p local -m qwen3-4b-instruct $argv
-        if set -q NANOCODER_SERVER
-            echo "Stopping llama-server..."
-            kill $NANOCODER_SERVER_PID 2>/dev/null
-            set -e NANOCODER_SERVER
-            set -e NANOCODER_SERVER_PID
-        end
-      '';
     };
   };
 }

@@ -23,5 +23,10 @@
       url = "github:NotAShelf/nvf";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    gruvbox-wallpapers = {
+      url = "github:AngelJumbo/gruvbox-wallpapers";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 }

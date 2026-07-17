@@ -12,17 +12,13 @@
       enable = true;
       package = pkgs.mariadb;
     };
-    services.mysql.ensureDatabases = [ "itah" ];
-    services.mysql.ensureUsers = [{
-      name = "itah";
-      ensurePermissions = { "itah.*" = "ALL PRIVILEGES"; };
-    }];
     systemd.services.mysql.wantedBy = lib.mkForce [ ];
     services.fwupd.enable = true;
     hardware.bluetooth.enable = true;
-    powerManagement.powertop.enable = true;
     services.power-profiles-daemon.enable = true;
-    services.thermald.enable = true;
     services.fstrim.enable = true;
+    services.fprintd.enable = true;
+    security.pam.services.login.fprintAuth = true;
+    security.pam.services.sudo.fprintAuth = true;
   };
 }

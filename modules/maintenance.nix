@@ -1,12 +1,7 @@
 { ... }: {
   flake.modules.nixos.maintenance = { pkgs, ... }: {
-    nix.gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 7d";
-    };
     nix.optimise.automatic = true;
-    nix.optimise.dates = [ "weekly" ];
+    nix.optimise.dates = [ "daily" ];
 
     systemd.services.nixos-upgrade-push = {
       description = "Update flake inputs, rebuild, commit & push /etc/nixos";
@@ -26,6 +21,8 @@
 
         nix flake update
 
+        nix flake check --no-build
+
         nixos-rebuild switch --flake /etc/nixos#nixos
 
         if ! git diff --quiet HEAD --; then
@@ -41,9 +38,27 @@
     systemd.timers.nixos-upgrade-push = {
       wantedBy = [ "timers.target" ];
       timerConfig = {
-        OnCalendar = "Sun 03:00";
+        OnBootSec = "10m";
+        OnUnitActiveSec = "7d";
         Persistent = true;
-        RandomizedDelaySec = "1h";
+      };
+    };
+
+    systemd.services.nixos-cleanup = {
+      description = "Remove old Nix generations and boot entries";
+      serviceConfig.Type = "oneshot";
+      script = ''
+        nix-collect-garbage --delete-older-than 7d
+        bootctl remove-old 2>/dev/null || true
+      '';
+    };
+
+    systemd.timers.nixos-cleanup = {
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnCalendar = "daily";
+        Persistent = true;
+        RandomizedDelaySec = "30m";
       };
     };
   };

@@ -1,6 +1,3 @@
-vim.g.mapleader = " "
-vim.g.maplocalleader = "\\"
-
 local function parse_noctalia(path)
   local f = io.open(vim.fn.expand(path))
   if not f then return nil end
@@ -21,16 +18,22 @@ end
 
 local function apply_noctalia()
   local c = parse_noctalia('~/.config/kitty/themes/noctalia.conf')
-  if not c then return end
+  if not c then
+    vim.notify('noctalia: could not load kitty theme', vim.log.levels.WARN)
+    return
+  end
   local bg, fg, muted, sel = c.bg, c.fg, c[8], c.sel or c[0]
   local mauve, blue, pink = c[4], c[2], c[1]
 
-  require('base16-colorscheme').setup({
-    base00 = bg,  base01 = c[0], base02 = c[8], base03 = c[8],
-    base04 = c[3], base05 = fg,  base06 = fg,  base07 = fg,
-    base08 = c[1], base09 = c[3], base0A = c[3], base0B = c[2],
-    base0C = c[6], base0D = c[4], base0E = c[5], base0F = c[1],
-  })
+  local ok, base16 = pcall(require, 'base16-colorscheme')
+  if ok then
+    base16.setup({
+      base00 = bg,  base01 = c[0], base02 = c[8], base03 = c[8],
+      base04 = c[3], base05 = fg,  base06 = fg,  base07 = fg,
+      base08 = c[1], base09 = c[3], base0A = c[3], base0B = c[2],
+      base0C = c[6], base0D = c[4], base0E = c[5], base0F = c[1],
+    })
+  end
 
   local hi = function(g, o) vim.api.nvim_set_hl(0, g, o) end
   hi('TelescopeNormal',         { fg = fg, bg = bg })
@@ -46,35 +49,41 @@ local function apply_noctalia()
   hi('TelescopeSelectionCaret', { fg = mauve, bg = sel })
   hi('TelescopeMatching',       { fg = mauve, bold = true })
 
-  require('lualine').setup({
-    options = {
-      theme = {
-        normal   = { a = { fg = bg, bg = mauve },  b = { fg = fg, bg = sel }, c = { fg = muted, bg = bg } },
-        insert   = { a = { fg = bg, bg = blue } },
-        visual   = { a = { fg = bg, bg = mauve } },
-        replace  = { a = { fg = bg, bg = pink } },
-        command  = { a = { fg = bg, bg = mauve } },
-        terminal = { a = { fg = bg, bg = mauve } },
-        inactive = { a = { fg = muted, bg = sel }, b = { fg = muted, bg = sel }, c = { fg = muted, bg = bg } },
+  local ok_lualine, lualine = pcall(require, 'lualine')
+  if ok_lualine then
+    lualine.setup({
+      options = {
+        theme = {
+          normal   = { a = { fg = bg, bg = mauve },  b = { fg = fg, bg = sel }, c = { fg = muted, bg = bg } },
+          insert   = { a = { fg = bg, bg = blue } },
+          visual   = { a = { fg = bg, bg = mauve } },
+          replace  = { a = { fg = bg, bg = pink } },
+          command  = { a = { fg = bg, bg = mauve } },
+          terminal = { a = { fg = bg, bg = mauve } },
+          inactive = { a = { fg = muted, bg = sel }, b = { fg = muted, bg = sel }, c = { fg = muted, bg = bg } },
+        },
+        component_separators = { left = "\u{E0B0}", right = "\u{E0B2}" },
+        section_separators = { left = "\u{E0B0}", right = "\u{E0B2}" },
+        icons_enabled = true,
       },
-      component_separators = { left = "\u{E0B0}", right = "\u{E0B2}" },
-      section_separators = { left = "\u{E0B0}", right = "\u{E0B2}" },
-      icons_enabled = true,
-    },
-    sections = {
-      lualine_a = { 'mode' },
-      lualine_b = { 'branch', 'diff', 'diagnostics' },
-      lualine_c = { { 'filename', path = 1 } },
-      lualine_x = { 'encoding', 'fileformat', 'filetype' },
-      lualine_y = { 'progress' },
-      lualine_z = { 'location' },
-    },
-    extensions = { 'nvim-tree', 'nvim-dap-ui' },
-  })
+      sections = {
+        lualine_a = { 'mode' },
+        lualine_b = { 'branch', 'diff', 'diagnostics' },
+        lualine_c = { { 'filename', path = 1 } },
+        lualine_x = { 'encoding', 'fileformat', 'filetype' },
+        lualine_y = { 'progress' },
+        lualine_z = { 'location' },
+      },
+      extensions = { 'nvim-tree', 'nvim-dap-ui' },
+    })
+  end
 end
 
 apply_noctalia()
-vim.api.nvim_create_autocmd('FocusGained', { callback = apply_noctalia, desc = 'Sync nvim colors with noctalia' })
+vim.api.nvim_create_autocmd({ 'FocusGained', 'VimEnter' }, {
+  callback = apply_noctalia,
+  desc = 'Sync nvim colors with noctalia',
+})
 
 vim.diagnostic.config({
   signs = {
@@ -85,65 +94,76 @@ vim.diagnostic.config({
       [vim.diagnostic.severity.HINT]  = '➤',
     },
   },
+  float = { border = 'rounded' },
 })
 
-require('gitsigns').setup({
-  signs = {
-    add = { text = '│' }, change = { text = '│' },
-    delete = { text = '│' }, topdelete = { text = '│' },
-    changedelete = { text = '│' },
-  },
-  current_line_blame = false,
-})
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Prev diagnostic' })
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Next diagnostic' })
+vim.keymap.set('n', '<leader>dl', vim.diagnostic.open_float, { desc = 'Line diagnostics' })
 
-require('bufferline').setup({
-  options = {
-    mode = 'buffers',
-    separator_style = 'slant',
-    show_buffer_close_icons = true,
-    show_close_icon = false,
-    diagnostics = 'nvim_lsp',
-    offsets = { { filetype = 'NvimTree', text = 'File Explorer', text_align = 'left' } },
-  },
-})
+vim.keymap.set('n', '<S-h>', '<cmd>bprevious<CR>', { desc = 'Prev buffer' })
+vim.keymap.set('n', '<S-l>', '<cmd>bnext<CR>', { desc = 'Next buffer' })
+vim.keymap.set('n', '<leader>bd', '<cmd>bdelete<CR>', { desc = 'Delete buffer' })
 
-require('nvim-tree').setup({
-  renderer = { highlight_git = true, icons = { show = { git = true } } },
-  git = { enable = true },
-  view = { width = 30, side = 'left' },
-  update_focused_file = { enable = true, update_root = true },
-})
-vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<CR>', { desc = 'Toggle file explorer' })
-vim.keymap.set('n', '<leader>o', ':NvimTreeFocus<CR>', { desc = 'Focus file explorer' })
+vim.keymap.set('n', '<leader>sv', '<cmd>vsplit<CR>', { desc = 'Split vertical' })
+vim.keymap.set('n', '<leader>sh', '<cmd>split<CR>', { desc = 'Split horizontal' })
 
-local tb = require('telescope.builtin')
-vim.keymap.set('n', '<leader>ff', tb.find_files, { desc = 'Find files' })
-vim.keymap.set('n', '<leader>fg', tb.live_grep, { desc = 'Live grep' })
-vim.keymap.set('n', '<leader>fb', tb.buffers, { desc = 'Buffers' })
-vim.keymap.set('n', '<leader>fh', tb.help_tags, { desc = 'Help' })
+local ok_flash, flash = pcall(require, 'flash')
+if ok_flash then
+  flash.setup()
+  vim.keymap.set({ 'n', 'x', 'o' }, 's', flash.jump, { desc = 'Flash jump' })
+  vim.keymap.set({ 'n', 'x', 'o' }, 'S', flash.treesitter, { desc = 'Flash treesitter' })
+end
 
-require('which-key').setup({ preset = 'modern' })
+local ok_tc, tc = pcall(require, 'todo-comments')
+if ok_tc then
+  tc.setup()
+  vim.keymap.set('n', '<leader>ft', '<cmd>TodoTelescope<CR>', { desc = 'Find todos' })
+end
 
-local alpha = require('alpha')
-local dashboard = require('alpha.themes.dashboard')
-dashboard.section.header.val = {
-  '   ███╗   ██╗██╗██╗  ██╗██╗   ██╗',
-  '   ████╗  ██║██║╚██╗██╔╝╚██╗ ██╔╝',
-  '   ██╔██╗ ██║██║ ╚███╔╝  ╚████╔╝ ',
-  '   ██║╚██╗██║██║██╔╝ ██╗   ██║   ',
-  '   ╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝   ╚═╝   ',
-}
-dashboard.section.buttons.val = {
-  dashboard.button('e', '  New file', '<cmd>enew<CR>'),
-  dashboard.button('f', '󰈞  Find file', '<cmd>Telescope find_files<CR>'),
-  dashboard.button('r', '󰇚  Recent files', '<cmd>Telescope oldfiles<CR>'),
-  dashboard.button('g', '󰈞  Live grep', '<cmd>Telescope live_grep<CR>'),
-  dashboard.button('q', '󰅚  Quit', '<cmd>qa<CR>'),
-}
-dashboard.section.footer.val = 'noctalia · nvf · NixOS'
-alpha.setup(dashboard.opts)
+local ok_inc, inc_rename = pcall(require, 'inc-rename')
+if ok_inc then inc_rename.setup() end
+vim.keymap.set('n', '<leader>rn', function()
+  return ':IncRename ' .. vim.fn.expand('<cword>')
+end, { expr = true, desc = 'Rename symbol' })
 
-require("dapui").setup()
+local ok_wk, wk = pcall(require, 'which-key')
+if ok_wk then
+  wk.add({
+    { "<leader>d",  group = "diagnostics" },
+    { "<leader>g",  group = "git" },
+    { "<leader>b",  group = "buffer" },
+    { "<leader>s",  group = "split" },
+    { "<leader>f",  group = "find" },
+    { "<leader>l",  group = "lsp" },
+    { "<leader>t",  group = "tree" },
+    { "<leader>h",  group = "hunk" },
+  })
+end
+
+local alpha_ok, alpha = pcall(require, 'alpha')
+if alpha_ok then
+  local dashboard = require('alpha.themes.dashboard')
+  dashboard.section.header.val = {
+    '   ███╗   ██╗██╗██╗  ██╗██╗   ██╗',
+    '   ████╗  ██║██║╚██╗██╔╝╚██╗ ██╔╝',
+    '   ██╔██╗ ██║██║ ╚███╔╝  ╚████╔╝ ',
+    '   ██║╚██╗██║██║██╔╝ ██╗   ██║   ',
+    '   ╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝   ╚═╝   ',
+  }
+  dashboard.section.buttons.val = {
+    dashboard.button('e', '󰈙  New file', '<cmd>enew<CR>'),
+    dashboard.button('f', '󰈞  Find file', '<cmd>Telescope find_files<CR>'),
+    dashboard.button('r', '󰇚  Recent files', '<cmd>Telescope oldfiles<CR>'),
+    dashboard.button('g', '󰈞  Live grep', '<cmd>Telescope live_grep<CR>'),
+    dashboard.button('q', '󰅚  Quit', '<cmd>qa<CR>'),
+  }
+  dashboard.section.footer.val = 'noctalia · nvf · NixOS'
+  alpha.setup(dashboard.opts)
+end
+
+local ok_dapui, dapui = pcall(require, 'dapui')
+if ok_dapui then dapui.setup() end
 
 local cmp = require("cmp")
 local luasnip = require("luasnip")
@@ -154,6 +174,13 @@ cmp.setup({
   snippet = {
     expand = function(args) luasnip.lsp_expand(args.body) end,
   },
+  window = {
+    completion = cmp.config.window.bordered(),
+    documentation = cmp.config.window.bordered(),
+  },
+  experimental = {
+    ghost_text = true,
+  },
   sources = cmp.config.sources({
     { name = "nvim_lsp" },
     { name = "luasnip" },
@@ -162,6 +189,7 @@ cmp.setup({
   }),
   mapping = cmp.mapping.preset.insert({
     ["<C-Space>"] = cmp.mapping.complete(),
+    ["<C-e>"] = cmp.mapping.abort(),
     ["<CR>"] = cmp.mapping.confirm({ select = true }),
     ["<Tab>"] = cmp.mapping(function(fallback)
       if cmp.visible() then
@@ -195,3 +223,12 @@ cmp.setup.cmdline(":", {
     { name = "cmdline" },
   }),
 })
+
+local ok_autopairs, npairs = pcall(require, 'nvim-autopairs')
+if ok_autopairs then
+  npairs.setup({ check_ts = true })
+  local ok_ap_cmp, ap_cmp = pcall(require, 'nvim-autopairs.completion.cmp')
+  if ok_ap_cmp then
+    cmp.event:on('confirm_done', ap_cmp.on_confirm_done())
+  end
+end

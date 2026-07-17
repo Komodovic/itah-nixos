@@ -1,6 +1,9 @@
-{ ... }: {
-  flake.modules.nixos.desktop = { inputs, pkgs, ... }: {
-    imports = [ inputs.noctalia.nixosModules.default ];
+{ inputs, ... }: let
+  noctalia-nixos-module = inputs.noctalia.nixosModules.default;
+  niri-packages = inputs.niri.packages;
+in {
+  flake.modules.nixos.desktop = { pkgs, ... }: {
+    imports = [ noctalia-nixos-module ];
 
     programs.dconf.enable = true;
     programs.fuse.enable = true;
@@ -24,8 +27,12 @@
       };
     };
 
+    services.getty.autologinUser = "itah";
+
+    environment.sessionVariables.BROWSER = "brave";
+
     programs.niri.enable = true;
-    programs.niri.package = inputs.niri.packages.${pkgs.stdenv.hostPlatform.system}.niri;
+    programs.niri.package = niri-packages.${pkgs.stdenv.hostPlatform.system}.niri;
     programs.noctalia.enable = true;
 
     environment.sessionVariables = {
@@ -36,7 +43,24 @@
     };
   };
 
-  flake.modules.homeManager.desktop = {
+  flake.modules.homeManager.desktop = { pkgs, ... }: {
+    home.pointerCursor = {
+      enable = true;
+      package = pkgs.bibata-cursors;
+      name = "Bibata-Modern-Classic";
+      size = 18;
+      x11.enable = true;
+    };
+
+    gtk = {
+      enable = true;
+      cursorTheme = {
+        package = pkgs.bibata-cursors;
+        name = "Bibata-Modern-Classic";
+        size = 18;
+      };
+    };
+
     xdg.configFile."niri/config.kdl".source = ./niri-config.kdl;
   };
 }

@@ -9,20 +9,14 @@
       audacity
       bat
       bibata-cursors
-      (brave.override { commandLineArgs = "--enable-features=VaapiVideoDecoder,VaapiVideoEncoder,AcceleratedVideoDecodeLinuxGL,AcceleratedVideoEncoder"; })
+      brave
       brightnessctl
-      btop
       cava
       cliphist
       eza
       fastfetch
-      fd
-      file
-      firefox
       fzf
-      gcc
       git
-      glib
       gnumake
       imv
       jmtpfs
@@ -33,9 +27,9 @@
       libreoffice-fresh
       localsend
       mariadb
+      mycli
       mpv
       mysql-workbench
-      neovim
       netbeans
       nodejs
       obs-studio
@@ -47,12 +41,12 @@
       tree-sitter
       unar
       unzip
+      aria2
       wget
       xwayland-satellite
       yazi
       zathura
       zoxide
-
       atuin
       bat-extras.batdiff
       bat-extras.batman
@@ -63,19 +57,13 @@
       nh
       ouch
       pay-respects
+      pavucontrol
       procs
-      starship
       tokei
       watchexec
+      wl-clipboard
       yq
       gh
-
-      clang-tools
-      cmake
-      gdb
-      jdk
-      maven
-      gradle
     ];
   };
 }

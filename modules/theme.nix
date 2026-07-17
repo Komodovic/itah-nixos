@@ -1,29 +1,12 @@
 { ... }: {
   flake.modules.homeManager.theme = { pkgs, ... }: {
-    home.pointerCursor = {
-      enable = true;
-      package = pkgs.bibata-cursors;
-      name = "Bibata-Modern-Classic";
-      size = 18;
-      x11.enable = true;
-    };
-
-    gtk = {
-      enable = true;
-      cursorTheme = {
-        package = pkgs.bibata-cursors;
-        name = "Bibata-Modern-Classic";
-        size = 18;
-      };
-    };
-
     xdg.mimeApps = {
       enable = true;
       defaultApplications = {
-        "text/html" = "brave-browser.desktop";
-        "x-scheme-handler/http" = "brave-browser.desktop";
-        "x-scheme-handler/https" = "brave-browser.desktop";
-        "x-scheme-handler/chrome" = "brave-browser.desktop";
+        "text/html" = "firefox.desktop";
+        "x-scheme-handler/http" = "firefox.desktop";
+        "x-scheme-handler/https" = "firefox.desktop";
+        "x-scheme-handler/chrome" = "firefox.desktop";
 
         "image/avif" = "imv.desktop";
         "image/bmp" = "imv.desktop";
@@ -55,7 +38,7 @@
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document" = "writer.desktop";
         "application/vnd.ms-excel" = "calc.desktop";
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" = "calc.desktop";
-        "application/vnd.ms-powerpoint" = "impress.desktop";
+        "application/vnd.ms-powerpoint" = "calc.desktop";
         "application/vnd.openxmlformats-officedocument.presentationml.presentation" = "impress.desktop";
 
         "text/plain" = "nvim.desktop";
