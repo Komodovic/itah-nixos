@@ -38,7 +38,6 @@
     systemd.timers.nixos-upgrade-push = {
       wantedBy = [ "timers.target" ];
       timerConfig = {
-        OnBootSec = "10m";
         OnUnitActiveSec = "7d";
         Persistent = true;
       };
