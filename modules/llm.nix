@@ -2,7 +2,7 @@
   flake.modules.homeManager.llm = {
     programs.fish.functions = {
       __llm_model = ''
-        set -l default ~/models/qwen2.5-coder-7b-instruct-q4_k_m.gguf
+        set -l default ~/models/Qwen2.5-Coder-3B-Instruct-Q4_K_M.gguf
         if test -f "$default"
             echo "$default"
         else
@@ -11,7 +11,7 @@
       '';
 
       __llm_flags = ''
-        printf '%s\n' -ngl 99 -t 6 -c 16384 -b 2048 -ub 512 -ctk q8_0 -ctv q8_0 -fa on
+        printf '%s\n' -t 12 -c 8192 -b 2048 -fa on --mlock
       '';
 
       llm = ''
@@ -49,7 +49,7 @@
       '';
 
       nanocoder = ''
-        nanocoder --provider local --model qwen2.5-coder-7b-instruct $argv
+        command nanocoder --provider local --model qwen2.5-coder-3b-instruct $argv
       '';
 
     };
